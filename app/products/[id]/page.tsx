@@ -1,24 +1,33 @@
-import axios from 'axios';
-import { Product } from '../../types/product';
+// app/products/[id]/page.tsx
+import type { Product } from "../../types/product";
 
 interface Props {
-  params: { id: string };
+  // 1. Params is now a Promise
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { data: product } = await axios.get<Product>(`https://fakestoreapi.com/products/${params.id}`);
+  // 2. Await the params object
+  const { id } = await params;
+
+  // 3. Fetch from the source directly (Recommended for Server Components)
+  // Or: const res = await fetch(`http://localhost:3000/api/products/${id}`) 
+  // but direct fetch is faster.
+  const res = await fetch(`https://fakestoreapi.com/products/${id}`, { 
+    next: { revalidate: 10 } 
+  });
+  
+  const product: Product = await res.json();
+
+  if (!product || (product as any).error) {
+    return <p>Product not found.</p>;
+  }
 
   return (
-    <div className="row">
-      <div className="col-md-6 text-center">
-        <img src={product.image} alt={product.title} className="img-fluid" style={{ maxHeight: '400px', objectFit: 'contain' }} />
-      </div>
-      <div className="col-md-6">
-        <h2>{product.title}</h2>
-        <h4 className="text-success">${product.price}</h4>
-        <p>{product.description}</p>
-        <button className="btn btn-success">Add to Cart</button>
-      </div>
+    <div style={{ padding: '20px' }}>
+      <h2>{product.title}</h2>
+      <p>${product.price}</p>
+      <img src={product.image} alt={product.title} width={200} />
     </div>
   );
 }

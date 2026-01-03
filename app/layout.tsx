@@ -3,8 +3,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 export const metadata = {
-  title: 'E-commerce App',
-  description: 'Next.js e-commerce app with App Router & Bootstrap',
+  title: 'E-Shop',
+  description: 'Next.js App Router e-commerce app with Bootstrap',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
